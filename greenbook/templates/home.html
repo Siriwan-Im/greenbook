@@ -1,0 +1,197 @@
+{% extends 'side.html' %}
+
+{% block site_title %}<title>Home</title>{% endblock %}
+
+{% block content %}
+<style>
+  .home-wrapper {
+    padding: 20px 24px 32px 24px;
+  }
+
+  .home-hero {
+    background: #1f2630;
+    color: #fff;
+    border-radius: 28px;
+    margin: 0 0 32px 0;
+    padding: 64px 40px;
+    min-height: 380px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .home-hero h1 {
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 18px;
+  }
+
+  .home-hero p {
+    color: #b0b8c1;
+    font-size: 18px;
+    margin: 0 auto;
+    margin-top: 15px;
+    margin-bottom: 28px;
+    max-width: 760px;
+    line-height: 1.7;
+  }
+
+  .home-hero .btn {
+    padding: 12px 28px;
+    font-size: 16px;
+    border-radius: 10px;
+  }
+
+  .features {
+    background: transparent;
+    padding: 10px 0 20px 0;
+  }
+
+  .features .row {
+    row-gap: 40px;
+    }
+
+  .features {
+    padding: 40px 20px;
+  }
+/*
+  .feature-box {
+    text-align: left;
+    max-width: 320px;
+    margin: auto;
+  }
+  */
+  .feature-box {
+    background: transparent;
+    padding: 10px 10px;
+    }
+
+  .feature-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 26px;
+    margin-bottom: 20px;
+  }
+
+  .feature-title {
+    font-weight: 700;
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  .feature-text {
+    color: #6b7280;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  .feature-link {
+    color: #3b82f6;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 10px;
+  }
+
+  .feature-link:hover {
+    text-decoration: underline;
+  }
+
+  body.dark .home-hero {
+    background: #1a2230;
+  }
+
+  body.dark .feature-text {
+    color: #98a6b7;
+  }
+
+  @media (max-width: 768px) {
+    .home-wrapper {
+      padding: 16px;
+    }
+
+    .home-hero {
+      padding: 42px 20px;
+      min-height: auto;
+      border-radius: 22px;
+    }
+
+    .home-hero h1 {
+      font-size: 34px;
+    }
+
+    .home-hero p {
+      font-size: 16px;
+    }
+  }
+</style>
+
+<div class="home-wrapper">
+  <section class="home-hero">
+    <div class="container">
+      <h1>Welcome to Greenbook  <br> Prediction System</h1>
+
+      <p>
+        The system that assists in making decisions when evaluating the price of used cars based on various factors.
+      </p>
+
+      <!--<div class="mt-4 d-flex justify-content-center gap-3 flex-wrap">
+        <a href="#" class="btn btn-primary">Get Started</a>
+        <a href="#" class="btn btn-outline-light">Learn More</a>
+      </div>-->
+    </div>
+  </section>
+
+  <section class="features">
+  <div class="container">
+    <div class="row">
+
+      <div class="col-md-4">
+        <div class="feature-box">
+          <div class="feature-icon">
+            <i class="bi bi-lightbulb-fill"></i>
+          </div>
+          <div class="feature-title">Prediction</div>
+          <div class="feature-text">
+            Predicting the price of used cars based on fundamental factors that affect them.
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="feature-box">
+          <div class="feature-icon">
+            <i class="bi bi-map"></i>
+          </div>
+          <div class="feature-title">Brand Prediction</div>
+          <div class="feature-text">
+            Make a prediction about the price of a used car, taking the branch where it's sold as a supplementary factor.
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="feature-box">
+          <div class="feature-icon">
+            <i class="bi bi-calendar4"></i>
+          </div>
+          <div class="feature-title">Seasonal Prediction</div>
+          <div class="feature-text">
+            Predict the price of used cars, taking branch location and time period (month) as supplementary factors.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+ </section>
+</div>
+{% endblock %}

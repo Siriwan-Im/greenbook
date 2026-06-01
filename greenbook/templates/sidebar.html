@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hover Sidebar</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    herf="http://www.w3.org/2000/svg"
+  />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #364156;
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 74px;
+      background: linear-gradient(180deg, #1f2737, #125235);
+      color: #fff;
+      transition: width 0.3s ease;
+      overflow: hidden;
+      position: relative;
+      border-right: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .sidebar:hover {
+      width: 310px;
+    }
+
+    .brand {
+      height: 72px;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      font-size: 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      white-space: nowrap;
+    }
+
+    .nav-section {
+      padding: 24px 0;
+      height: calc(100vh - 72px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .menu-group {
+      width: 100%;
+    }
+
+    .section-title {
+      color: #9e917c;
+      font-weight: bold;
+      font-size: 15px;
+      padding: 0 22px 18px;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .sidebar:hover .section-title {
+      opacity: 1;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: #fff;
+      text-decoration: none;
+      padding: 16px 22px;
+      white-space: nowrap;
+      position: relative;
+    }
+
+    .menu-item:hover {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .menu-item i {
+      width: 18px;
+      min-width: 18px;
+      text-align: center;
+      font-size: 18px;
+      color: #8d8f9a;
+    }
+
+    .menu-text,
+    .badge,
+    .arrow,
+    .submenu {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .sidebar:hover .menu-text,
+    .sidebar:hover .badge,
+    .sidebar:hover .arrow,
+    .sidebar:hover .submenu {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .menu-text {
+      font-size: 17px;
+    }
+
+    .badge {
+      margin-left: auto;
+      background: #7167f6;
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 8px;
+    }
+
+    .arrow {
+      margin-left: auto;
+      color: #8d8f9a;
+      font-size: 14px;
+    }
+
+    .has-submenu {
+      flex-direction: column;
+      align-items: stretch;
+      padding: 0;
+    }
+
+    .has-submenu > .menu-head {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 16px 22px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .has-submenu > .menu-head:hover {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .submenu {
+      padding: 0 0 8px 60px;
+    }
+
+    .submenu a {
+      display: block;
+      color: #fff;
+      text-decoration: none;
+      padding: 14px 0;
+      font-size: 16px;
+    }
+
+    .submenu a::before {
+      content: "◦";
+      margin-right: 16px;
+      color: #a7aab3;
+    }
+
+    .bottom-links {
+      padding-bottom: 10px;
+    }
+
+    .content {
+      flex: 1;
+      background: #f5f5f5;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    
+    <aside class="sidebar">
+      <div class="brand"><i class="fa fa-list-ul" aria-hidden="true"></i></div>
+
+      <div class="nav-section">
+        <div class="menu-group">
+          <div class="section-title">PREDICTION</div>
+
+          <a href="#" class="menu-item">
+            <!--<i class="fa-solid fa-gauge"></i>-->
+            <i class="fa fa-line-chart" aria-hidden="true"></i>
+            <span class="menu-text">Normal Feature</span>
+          </a>
+
+          <a href="#" class="menu-item">
+            <!--<i class="fa-solid fa-gauge"></i>-->
+            <i class="fa fa-location-arrow" aria-hidden="true"></i>
+            <span class="menu-text">Branch Analysis</span>
+            <!--<span class="badge">NEW</span>-->
+          </a>
+
+          <a href="#" class="menu-item">
+            <!--<i class="fa-solid fa-gauge"></i>-->
+            <i class="fa fa-calendar" aria-hidden="true"></i>
+            <span class="menu-text">Seasonal Analysis</span>
+            <!--<span class="badge">NEW</span>-->
+          </a>
+
+          <div class="has-submenu">
+            <div class="menu-head">
+              <i class="fa-solid fa-code-branch"></i>
+              <span class="menu-text">Nav dropdown</span>
+              <span class="arrow">⌃</span>
+            </div>
+            <div class="submenu">
+              <a href="#">Nav dropdown item</a>
+              <a href="#">Nav dropdown item</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="bottom-links">
+          <a href="#" class="menu-item">
+            <!--<i class="fa-solid fa-layer-group"></i>-->
+            <i class="fa fa-user" aria-hidden="true"></i>
+            <span class="menu-text"> Logout </span>
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <main class="content"></main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>Login</title>
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body{
+            background:#f5f5f5;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            min-height:100vh;
+        }
+
+        .login-container{
+            width:100%;
+            max-width:420px;
+            padding:20px;
+        }
+
+        .login-title{
+            text-align:center;
+            font-size:24px;
+            font-weight:bold;
+            color:#114D32;
+            margin-bottom:40px;
+            letter-spacing:1px;
+        }
+
+        .input-box{
+            width:100%;
+            margin-bottom:20px;
+        }
+
+        .input-box input{
+            width:100%;
+            padding:18px 20px;
+            border:none;
+            background:#ececec;
+            font-size:16px;
+            color:#555;
+            border-radius:2px;
+            outline:none;
+        }
+
+        .options{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:30px;
+            font-size:14px;
+            color:#999;
+        }
+
+        .options label{
+            display:flex;
+            align-items:center;
+            gap:8px;
+        }
+
+        .options a{
+            color:#8a84ff;
+            text-decoration:none;
+            font-weight:500;
+        }
+
+        .login-btn{
+            width:100%;
+            padding:18px;
+            border:none;
+            background:#4AD797;
+            color:white;
+            font-size:14px;
+            font-weight:bold;
+            border-radius:2px;
+            cursor:pointer;
+            transition:0.3s;
+        }
+
+        .login-btn:hover{
+            background:#6b67eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-title">GREENBOOK</div>
+
+        <form action ="login" method="post">
+            {% csrf_token %}
+
+            <div class="input-box">
+                <input type="text" name="username" placeholder="Username" required>
+            </div>
+
+            <div class="input-box" style="position:relative;">
+                <input type="password" id="password" name="password" placeholder="Password" required>
+
+                <span onclick="togglePassword()" 
+                    style="position:absolute; right:15px; top:50%; transform:translateY(-50%);
+                            cursor:pointer; color:#777; font-size:14px;">
+                    Show
+            </div>
+            
+            <!--<div class="options">
+                <label>
+                    <input type="checkbox" name="remember">
+                    Remember me
+                </label>
+                <a href="#">Forgot?</a>
+            </div>
+            -->
+            {% if messages %}
+            <div class="alert alert-danger" role="alert">
+                {% for message in messages %}
+                <span style="font-size:14px;"> {{message}} </span>
+                {% endfor %}
+            </div>
+            {% endif%}
+
+            <button type="submit" class="login-btn">LOGIN</button>
+        </form>
+    </div>
+
+    <script>
+    function togglePassword() {
+        const pwd = document.getElementById("password");
+        const toggle = event.target;
+
+        if (pwd.type === "password") {
+            pwd.type = "text";
+            toggle.innerText = "Hide";
+        } else {
+            pwd.type = "password";
+            toggle.innerText = "Show";
+        }
+    }
+    </script>
+
+</body>
+</html>

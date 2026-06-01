@@ -1,0 +1,2049 @@
+{% extends 'side.html' %}
+
+{% block site_title %}<title> Branch Prediction</title>{% endblock %}
+
+{% block content %}
+<style>
+  .page-wrap {
+    padding: 20px 24px 32px 24px;
+  }
+
+  .form-card {
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 22px 24px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.10);
+    margin-bottom: 22px;
+  }
+
+  .form-section-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 18px;
+  }
+
+  .form-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px 28px;
+  }
+
+  .form-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 40px;
+  }
+
+  .form-grid-inline {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 18px 24px;
+    margin-bottom: 18px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+  }
+
+  .form-control,
+  .form-select {
+    height: 42px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    padding: 0 12px;
+    font-size: 14px;
+    outline: none;
+    background: #fff;
+    width: 100%;
+  }
+
+  .form-control:focus,
+  .form-select:focus {
+    border-color: #4AD797;
+    box-shadow: 0 0 0 3px rgba(74, 215, 151, 0.18);
+  }
+
+  .form-control.is-invalid-year,
+  .form-control.is-invalid-year:focus {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.22);
+  }
+
+  .combo-wrap {
+    position: relative;
+  }
+
+  .combo-input {
+    padding-right: 38px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16'%3E%3Cpath fill='%236b7280' d='M4 6l4 4 4-4z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px;
+  }
+
+  .combo-list {
+    position: absolute;
+    z-index: 30;
+    left: 0;
+    right: 0;
+    top: calc(100% + 6px);
+    max-height: 240px;
+    overflow-y: auto;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    display: none;
+    padding: 6px;
+  }
+
+  .combo-list.show {
+    display: block;
+  }
+
+  .combo-item {
+    border: none;
+    width: 100%;
+    text-align: left;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: transparent;
+    color: #111827;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .combo-item:hover,
+  .combo-item.active {
+    background: rgba(74, 215, 151, 0.18);
+  }
+
+  .combo-empty {
+    padding: 8px 10px;
+    color: #9ca3af;
+    font-size: 13px;
+  }
+
+  .info-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 42px;
+    font-size: 14px;
+    color: #374151;
+  }
+
+  .info-value {
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .detail-input {
+    /*display: none;*/
+    width: 100%;
+    max-width: 220px;
+  }
+
+  .predict-wrap {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .predict-btn {
+    min-width: 140px;
+    height: 40px;
+    border: none;
+    border-radius: 10px;
+    background: #1f2937;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+
+  .predict-btn:hover {
+    background: #111827;
+    transform: translateY(-1px);
+  }
+
+  .clear-btn {
+    min-width: 140px;
+    height: 40px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    background: #FF5C5C;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+
+  .clear-btn:hover {
+    background: #f3f4f6;
+    transform: translateY(-1px);
+  }
+
+  .result-card {
+    display: none;
+  }
+
+  .result-card.show {
+    display: block;
+  }
+
+  .result-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .result-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: rgba(74, 215, 151, 0.14);
+    color: #138a57;
+    font-size: 18px;
+  }
+
+  .result-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 20px;
+    margin-bottom: 18px;
+  }
+
+  .result-main {
+    background: #f8fafc;
+    border: 1px solid #ecf1f6;
+    border-radius: 18px;
+    padding: 22px;
+  }
+
+  .result-sub-main {
+    background: #f8fafc;
+    border: 1px solid #ecf1f6;
+    border-radius: 18px;
+    padding: 22px;
+    gap: 20px;
+  }
+
+
+  .result-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .result-price {
+    font-size: 38px;
+    font-weight: 800;
+    color: #111827;
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+
+  .result-subtext {
+    font-size: 15px;
+    color: #6b7280;
+    line-height: 1.7;
+  }
+
+  .history-card {
+    min-height: 280px;
+  }
+
+  .history-chart-wrap {
+    width: 100%;
+    height: 200px;
+    display: flex;
+    min-width: 0;
+  }
+
+  #historyChart {
+    width: 100% !important;
+    height: 100% !important;
+    flex: 1;
+    display: block;
+    max-width: 100%;
+  }
+
+  .history-empty {
+    display: none;
+    font-size: 14px;
+    color: #6b7280;
+    padding: 10px 0 4px;
+  }
+
+  .price-range-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin: 14px 0 10px;
+    width: 100%;
+  }
+
+  .price-range-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 10px 36px 10px 12px;
+    position: relative;
+    min-height: 72px;
+    width: 100%;
+  }
+
+  .price-range-title {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+
+  .price-range-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+  }
+
+  .price-range-card i {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+  }
+
+  .price-range-card .bi-caret-down-fill {
+    color: #dc2626;
+  }
+
+  .price-range-card .bi-caret-up-fill {
+    color: #16a34a;
+  }
+
+  .result-side {
+    display: grid;
+    gap: 14px;
+  }
+
+  .result-mini-card {
+    background: #f8fafc;
+    border: 1px solid #ecf1f6;
+    border-radius: 18px;
+    padding: 18px;
+  }
+
+  .mini-title {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .mini-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+  }
+
+  .helper-text {
+    margin-top: 6px;
+    font-size: 12px;
+    color: #9ca3af;
+  }
+
+  body.dark .form-card {
+    background: #18222d;
+    box-shadow: none;
+  }
+
+  body.dark .form-section-title,
+  body.dark .info-value,
+  body.dark .result-title,
+  body.dark .result-price,
+  body.dark .mini-value {
+    color: #edf3f8;
+  }
+
+  body.dark .form-label,
+  body.dark .info-row,
+  body.dark .result-subtext,
+  body.dark .mini-title,
+  body.dark .result-label {
+    color: #98a6b7;
+  }
+
+  body.dark .form-control,
+  body.dark .form-select {
+    background: #111b25;
+    border-color: #2b3949;
+    color: #edf3f8;
+  }
+
+  body.dark .form-control.is-invalid-year,
+  body.dark .form-control.is-invalid-year:focus {
+    border-color: #f87171;
+    box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.24);
+  }
+
+  body.dark .combo-input {
+    background-color: #111b25;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16'%3E%3Cpath fill='%2398a6b7' d='M4 6l4 4 4-4z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px;
+  }
+
+  body.dark .combo-list {
+    background: #111b25;
+    border-color: #2b3949;
+    box-shadow: none;
+  }
+
+  body.dark .combo-item {
+    color: #edf3f8;
+  }
+
+  body.dark .combo-item:hover,
+  body.dark .combo-item.active {
+    background: rgba(74, 215, 151, 0.14);
+  }
+
+  body.dark .combo-empty {
+    color: #6b7e94;
+  }
+
+  body.dark .predict-btn {
+    min-width: 140px;
+    height: 40px;
+    border: none;
+    border-radius: 10px;
+    background: #8a84ff;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+
+  body.dark .clear-btn {
+    border-color: #2b3949;
+    background: #FF5C5C;
+    color: #fff;
+  }
+  body.dark .result-main,
+  body.dark .result-mini-card {
+    background: #111b25;
+    border-color: #2b3949;
+  }
+
+  body.dark .result-sub-main {
+    background: #111b25;
+    border-color: #2b3949;
+  }
+
+  body.dark .price-range-card {
+    background: #0f1822;
+    border-color: #2b3949;
+  }
+
+  body.dark .price-range-value {
+    color: #edf3f8;
+  }
+
+  body.dark .history-empty {
+    color: #98a6b7;
+  }
+
+  .multi-result-wrap {
+    display: none;
+  }
+
+  .multi-result-wrap.show {
+    display: block;
+  }
+
+  .multi-result-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    font-size: 14px;
+  }
+
+  .multi-result-table thead th {
+    background: #f1f5f9;
+    color: #374151;
+    font-weight: 700;
+    padding: 12px 14px;
+    text-align: center;
+    border-bottom: 2px solid #e5e7eb;
+    white-space: nowrap;
+  }
+
+  .multi-result-table thead th:first-child {
+    text-align: left;
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: #e2e8f0;
+  }
+
+  .multi-result-table tbody td {
+    padding: 10px 14px;
+    text-align: center;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: top;
+    line-height: 1.5;
+  }
+
+  .multi-result-table tbody td:first-child {
+    font-weight: 700;
+    text-align: left;
+    background: #f8fafc;
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    white-space: nowrap;
+  }
+
+  .multi-result-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .multi-result-table tbody tr:hover td {
+    background: rgba(74, 215, 151, 0.07);
+  }
+
+  .multi-result-table tbody tr:hover td:first-child {
+    background: rgba(74, 215, 151, 0.13);
+  }
+
+  .cell-predicted {
+    font-weight: 700;
+    color: #111827;
+    font-size: 15px;
+  }
+
+  .cell-range {
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 2px;
+  }
+
+  .multi-table-overflow {
+    overflow-x: auto;
+    border-radius: 12px;
+    margin-bottom: 14px;
+  }
+
+  .branch-avg-wrap {
+    margin-bottom: 14px;
+  }
+
+  .branch-map-and-avg {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 14px;
+    align-items: start;
+    margin-bottom: 14px;
+  }
+
+  .branch-avg-wrap .multi-table-overflow {
+    margin-bottom: 0;
+  }
+
+  .multi-result-note {
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 14px;
+    margin-bottom: 14px;
+  }
+
+  .branch-map-wrap {
+    display: none;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-bottom: 14px;
+  }
+
+  .branch-map-wrap.show {
+    display: block;
+  }
+
+  .branch-map-title {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .branch-map-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 8px;
+  }
+
+  .branch-map-legend {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 10px 0;
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  .branch-map-legend-bar {
+    width: 180px;
+    height: 10px;
+    border-radius: 99px;
+    border: 1px solid #d1d5db;
+    background: linear-gradient(90deg, #d1fae5 0%, #10b981 100%);
+  }
+
+  .branch-geo-map {
+    width: 100%;
+    max-width: 840px;
+    height: 520px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #d1d5db;
+    background: #f3f4f6;
+    margin-bottom: 12px;
+  }
+
+  .branch-map-btn {
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #1f2937;
+    padding: 8px 10px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .branch-map-btn:hover {
+    border-color: #4AD797;
+    background: rgba(74, 215, 151, 0.12);
+  }
+
+  .branch-map-btn.active {
+    border-color: #4AD797;
+    background: rgba(74, 215, 151, 0.2);
+    color: #0f5132;
+  }
+
+  body.dark .multi-result-table {
+    border-color: #2b3949;
+  }
+
+  body.dark .multi-result-table thead th {
+    background: #1a2635;
+    color: #98a6b7;
+    border-bottom-color: #2b3949;
+  }
+
+  body.dark .multi-result-table thead th:first-child {
+    background: #15202d;
+  }
+
+  body.dark .multi-result-table tbody td {
+    border-bottom-color: #1a2635;
+  }
+
+  body.dark .multi-result-table tbody td:first-child {
+    background: #111b25;
+  }
+
+  body.dark .multi-result-table tbody tr:hover td {
+    background: rgba(74, 215, 151, 0.05);
+  }
+
+  body.dark .multi-result-table tbody tr:hover td:first-child {
+    background: rgba(74, 215, 151, 0.1);
+  }
+
+  body.dark .cell-predicted {
+    color: #edf3f8;
+  }
+
+  body.dark .cell-range {
+    color: #6b7e94;
+  }
+
+  body.dark .branch-map-btn {
+    background: #111b25;
+    border-color: #2b3949;
+    color: #edf3f8;
+  }
+
+  body.dark .branch-map-btn:hover {
+    border-color: #4AD797;
+    background: rgba(74, 215, 151, 0.12);
+  }
+
+  body.dark .branch-map-btn.active {
+    border-color: #4AD797;
+    background: rgba(74, 215, 151, 0.18);
+    color: #d1fae5;
+  }
+
+  body.dark .branch-geo-map {
+    border-color: #2b3949;
+    background: #0f1822;
+  }
+
+  @media (max-width: 992px) {
+    .form-grid-4,
+    .form-grid-inline {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .form-grid-2,
+    .result-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .branch-map-and-avg {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .page-wrap {
+      padding: 16px;
+    }
+
+    .form-grid-4,
+    .form-grid-inline,
+    .form-grid-2 {
+      grid-template-columns: 1fr;
+    }
+
+    .form-card {
+      padding: 12px;
+      border-radius: 16px;
+    }
+
+    .result-price {
+      font-size: 30px;
+    }
+
+    .price-range-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="page-wrap">
+  <div class="form-card">
+    <div class="form-section-title">Car Model</div>
+
+    <div class="form-grid-4">
+      <div class="form-group">
+        <label class="form-label">Brand Name (*)</label>
+        <div class="combo-wrap">
+          <input type="text" class="form-select combo-input" id="brandName" name="brand_name" placeholder="Select brand" autocomplete="off">
+          <div class="combo-list" id="brandNameList">
+            {% for brand in brands %}
+            <button type="button" class="combo-item" data-value="{{ brand }}">{{ brand }}</button>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Model (*)</label>
+        <div class="combo-wrap">
+          <input type="text" class="form-select combo-input" id="modelName" name="model_name" placeholder="Select model" autocomplete="off">
+          <div class="combo-list" id="modelNameList"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Sub Model (*)</label>
+        <div class="combo-wrap">
+          <input type="text" class="form-select combo-input" id="subModel" name="sub_model" placeholder="Select sub model" autocomplete="off">
+          <div class="combo-list" id="subModelList"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Year of Manufacture (*)</label>
+        <div class="combo-wrap">
+          <input type="text" class="form-select combo-input" id="yearManufacture" name="year_of_manufacture" placeholder="Select year" autocomplete="off" inputmode="numeric">
+          <div class="combo-list" id="yearManufactureList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-card">
+    <div class="form-section-title">Car Detail</div>
+
+    <div class="form-grid-inline">
+      <div class="info-row">
+        <span>Car Type (*):</span>
+        <span class="info-value" id="carTypeValue">-</span>
+        <select class="form-select detail-input" id="carTypeInput"></select>
+      </div>
+
+      <div class="info-row">
+        <span>Gear (*):</span>
+        <span class="info-value" id="gearValue">-</span>
+        <select class="form-select detail-input" id="gearInput"></select>
+      </div>
+
+      <div class="info-row">
+        <span>Asset Group (*):</span>
+        <span class="info-value" id="assetGroupValue">-</span>
+        <select class="form-select detail-input" id="assetGroupInput"></select>
+      </div>
+
+      <div class="info-row">
+        <span>Fuel (*):</span>
+        <span class="info-value" id="fuelValue">-</span>
+        <select class="form-select detail-input" id="fuelInput"></select>
+      </div>
+
+      <div class="info-row">
+        <span>Engine (*):</span>
+        <span class="info-value" id="engineValue">-</span>
+        <input type="text" class="form-control detail-input" id="engineInput" placeholder="x.x">
+      </div>
+
+      <div class="info-row">
+        <span>New Price (*):</span>
+        <span class="info-value" id="newPriceValue">-</span>
+        <input type="number" class="form-control detail-input" id="newPriceInput" placeholder="e.g. 750000">
+      </div>
+    </div>
+
+    <div class="form-grid-2">
+      <div class="form-group">
+        <label class="form-label">Asset Register Year (*)</label>
+        <input type="number" class="form-control" id="assetRegisterYear" name="asset_register_year" placeholder="e.g. 2021">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Mile</label>
+        <input type="number" class="form-control" id="mile" name="mile" placeholder="e.g. 45000">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Historical (*)</label>
+        <select class="form-select" id="historical" name="historical">
+          <option value="">Select historical</option>
+          <option value="no-accident">No accident</option>
+          <option value="flood">Flood</option>
+          <option value="unmoved-engine">Unmoved-Engine</option>
+          <option value="unmoved">Unmoved</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Grade (1-5 : 5 is the best)</label>
+        <input type="text" class="form-control" id="grade" name="grade" placeholder="e.g. 5">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Branch</label>
+        <select class="form-select" id="branch" name="branch">
+          <option value="">Select branch</option>
+          <option value="Bangkok">Bangkok</option>
+          <option value="Nakhon Ratchasima">Nakhon Ratchasima</option>
+          <option value="Pattaya">Pattaya</option>
+          <option value="Rangsit klong 8">Rangsit klong 8</option>
+          <option value="Songkhla">Songkhla</option>
+          <option value="Surat Thani">Surat Thani</option>
+          <option value="Udon Thani">Udon Thani</option>
+          <option value="Chaing Mai">Chaing Mai</option>
+          <option value="Khon Kaen">Khon Kaen</option>
+          <option value="Ubon Ratchathani">Ubon Ratchathani</option>
+          <option value="Rayong">Rayong</option>
+          <option value="Ratchaburi">Ratchaburi</option>
+        </select>
+      </div>
+
+    </div>
+    <div id="formAlert" class="alert alert-danger" role="alert" style="display:none; margin-top:16px;"></div>
+    <div class="predict-wrap">
+      <button type="button" class="predict-btn" id="predictBtn">Predict</button>
+      <button type="button" class="clear-btn" id="clearBtn">Clear</button>
+    </div>
+  </div>
+  
+
+  <div class="form-card result-card" id="resultCard">
+    <div class="result-header">
+      <div class="result-icon">
+        <i class="bi bi-lightbulb"></i>
+      </div>
+      <h3 class="result-title">Result</h3>
+    </div>
+
+    <!-- Single result -->
+    <div class="result-grid" id="singleResultGrid">
+      <div class="result-main">
+        <div class="result-label">Predicted Price</div>
+        <div class="result-price" id="predictedPrice">450,000 THB</div>
+        <div class="result-subtext" id="resultSummary">
+          This estimated used car price is calculated from the selected vehicle information,
+          registration year, mileage, vehicle grade, and other related details.
+        </div>
+        <div class="price-range-grid">
+          <div class="price-range-card">
+            <div class="price-range-title">Min Price</div>
+            <div class="price-range-value" id="predictedMinPrice">-</div>
+            <i class="bi bi-caret-down-fill"></i>
+          </div>
+          <div class="price-range-card">
+            <div class="price-range-title">Max Price</div>
+            <div class="price-range-value" id="predictedMaxPrice">-</div>
+            <i class="bi bi-caret-up-fill"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="result-side">
+        <div class="result-mini-card">
+          <div class="mini-title">Brand / Model</div>
+          <div class="mini-value" id="resultBrandModel">-</div>
+        </div>
+
+        <div class="result-mini-card">
+          <div class="mini-title">Fuel</div>
+          <div class="mini-value" id="resultFuel">-</div>
+        </div>
+
+        <div class="result-mini-card">
+          <div class="mini-title">Branch</div>
+          <div class="mini-value" id="resultBranch">-</div>
+        </div>
+
+        <div class="result-mini-card">
+          <div class="mini-title">New Price</div>
+          <div class="mini-value" id="resultNewPrice">-</div>
+          <div class="helper-text">Information from the vehicle inspection</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Multi result table -->
+    <div class="multi-result-wrap" id="multiResultWrap">
+      <div class="result-subtext" id="multiResultSummary" style="margin-bottom:14px;"></div>
+
+      <div class="form-grid-2" style="margin-bottom:18px;">
+        <div class="result-mini-card">
+          <div class="mini-title">Brand / Model</div>
+          <div class="mini-value" id="multiResultBrandModel">-</div>
+        </div>
+        <div style="display:flex;gap:14px;">
+          <div class="result-mini-card" style="flex:1;">
+            <div class="mini-title">Fuel</div>
+            <div class="mini-value" id="multiResultFuel">-</div>
+          </div>
+          <div class="result-mini-card" style="flex:1;">
+            <div class="mini-title">Branch</div>
+            <div class="mini-value" id="multiResultBranch">-</div>
+          </div>
+          <div class="result-mini-card" style="flex:1;">
+            <div class="mini-title">New Price</div>
+            <div class="mini-value" id="multiResultNewPrice">-</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="branch-map-and-avg">
+        <div class="branch-map-wrap" id="branchMapWrap">
+          <div class="branch-map-title">เลือกสาขาจากแผนที่ (คลิกที่สาขาเพื่อดูตาราง Grade/Mile)</div>
+          <div class="branch-map-legend">
+            <span>ราคาต่ำ</span>
+            <div class="branch-map-legend-bar"></div>
+            <span>ราคาสูง</span>
+          </div>
+          <div class="branch-geo-map" id="branchGeoMap"></div>
+        </div>
+        <div class="branch-avg-wrap">
+          <div class="mini-title">ราคาเฉลี่ยรายสาขา (THB)</div>
+          <div class="multi-table-overflow">
+            <table class="multi-result-table" id="branchAvgTable">
+              <thead>
+                <tr>
+                  <th>สาขา</th>
+                  <th>ราคาเฉลี่ย</th>
+                </tr>
+              </thead>
+              <tbody id="branchAvgBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="branch-map-grid" id="branchMapGrid"></div>
+      <div class="multi-result-note" id="multiResultNote" style="margin-bottom:14px;"></div>
+      <div class="multi-table-overflow">
+        <table class="multi-result-table" id="multiResultTable">
+          <thead id="multiResultHead"></thead>
+          <tbody id="multiResultBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="result-sub-main">
+      <div class="mini-title">Sales History (Time vs Sold)</div>
+      <div class="history-empty" id="historyEmpty">ไม่พบข้อมูลการขายในอดีต</div>
+      <div class="history-chart-wrap">
+        <canvas id="historyChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="https://www.gstatic.com/charts/51/js/jsapi_compiled_geochart_module.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const predictBtn = document.getElementById("predictBtn");
+  const clearBtn = document.getElementById("clearBtn");
+  const resultCard = document.getElementById("resultCard");
+
+  const brandSelect = document.getElementById("brandName");
+  const modelSelect = document.getElementById("modelName");
+  const subModelSelect = document.getElementById("subModel");
+  const yearSelect = document.getElementById("yearManufacture");
+  const brandNameList = document.getElementById("brandNameList");
+  const modelNameList = document.getElementById("modelNameList");
+  const subModelList = document.getElementById("subModelList");
+  const yearManufactureList = document.getElementById("yearManufactureList");
+  const assetRegisterYear = document.getElementById("assetRegisterYear");
+  let lastSyncedManufactureYear = "";
+  const mile = document.getElementById("mile");
+  const historical = document.getElementById("historical");
+  const branch = document.getElementById("branch"); 
+  const grade = document.getElementById("grade");
+
+  const singleResultGrid = document.getElementById("singleResultGrid");
+  const multiResultWrap = document.getElementById("multiResultWrap");
+  const resultBrandModel = document.getElementById("resultBrandModel");
+  const resultFuel = document.getElementById("resultFuel");
+  const resultBranch = document.getElementById("resultBranch");
+  const resultNewPrice = document.getElementById("resultNewPrice");
+  const predictedPrice = document.getElementById("predictedPrice");
+  const predictedMinPrice = document.getElementById("predictedMinPrice");
+  const predictedMaxPrice = document.getElementById("predictedMaxPrice");
+  const resultSummary = document.getElementById("resultSummary");
+  const historyEmpty = document.getElementById("historyEmpty");
+  const historyChartCanvas = document.getElementById("historyChart");
+  const formAlert = document.getElementById("formAlert");
+
+  const multiResultBrandModel = document.getElementById("multiResultBrandModel");
+  const multiResultFuel = document.getElementById("multiResultFuel");
+  const multiResultBranch = document.getElementById("multiResultBranch");
+  const multiResultNewPrice = document.getElementById("multiResultNewPrice");
+  const multiResultSummary = document.getElementById("multiResultSummary");
+  const multiResultNote = document.getElementById("multiResultNote");
+  const multiResultHead = document.getElementById("multiResultHead");
+  const multiResultBody = document.getElementById("multiResultBody");
+  const branchAvgBody = document.getElementById("branchAvgBody");
+  const branchMapWrap = document.getElementById("branchMapWrap");
+  const branchMapGrid = document.getElementById("branchMapGrid");
+  const branchGeoMap = document.getElementById("branchGeoMap");
+  let historyChart = null;
+  let geoBranchChart = null;
+  let geoChartReady = Boolean(
+    window.google &&
+    google.visualization &&
+    typeof google.visualization.GeoChart === "function"
+  );
+  let geoChartLoading = false;
+  const geoChartReadyQueue = [];
+  let geoDrawVersion = 0;
+  let currentMultiData = null;
+  let activeBranch = "";
+
+  const carTypeValue = document.getElementById("carTypeValue");
+  const gearValue = document.getElementById("gearValue");
+  const assetGroupValue = document.getElementById("assetGroupValue");
+  const fuelValue = document.getElementById("fuelValue");
+  const engineValue = document.getElementById("engineValue");
+  const newPriceValue = document.getElementById("newPriceValue");
+  const carTypeInput = document.getElementById("carTypeInput");
+  const gearInput = document.getElementById("gearInput");
+  const assetGroupInput = document.getElementById("assetGroupInput");
+  const engineInput = document.getElementById("engineInput");
+  const fuelInput = document.getElementById("fuelInput");
+  const newPriceInput = document.getElementById("newPriceInput");
+  const csrfToken = "{{ csrf_token }}";
+  let manualDetailMode = false;
+
+  const comboRegistry = new Map();
+
+  function formatComboOption(item) {
+    if (item == null || item === "") return "";
+    if (typeof item === "number" && Number.isFinite(item)) return String(Math.round(item));
+    return String(item).trim();
+  }
+
+  function showFormError(text) {
+    if (!formAlert) return;
+    formAlert.textContent = text || "Cannot predict price now.";
+    formAlert.style.display = "block";
+  }
+
+  function clearFormError() {
+    if (!formAlert) return;
+    formAlert.textContent = "";
+    formAlert.style.display = "none";
+  }
+
+  function registerCombo(inputElement, listElement) {
+    const presetSeen = new Set();
+    const presetOptions = Array.from(listElement.querySelectorAll(".combo-item"))
+      .map((el) => formatComboOption(el.dataset.value || el.textContent))
+      .filter(v => v && !presetSeen.has(v) && presetSeen.add(v));
+    const state = { options: [], filtered: [], activeIndex: -1, isOpen: false };
+    state.options = presetOptions;
+    listElement.innerHTML = "";
+
+    function close() {
+      state.isOpen = false;
+      state.activeIndex = -1;
+      listElement.classList.remove("show");
+    }
+
+    function selectValue(value, triggerChange = true) {
+      inputElement.value = value;
+      close();
+      if (triggerChange) {
+        inputElement.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+    }
+
+    function render(filterText = "", showAll = false) {
+      const q = String(filterText || "").trim().toLowerCase();
+      state.filtered = state.options.filter(v => showAll || !q || v.toLowerCase().includes(q)).slice(0, 80);
+      listElement.innerHTML = "";
+
+      if (!state.filtered.length) {
+        if (q) {
+          const empty = document.createElement("div");
+          empty.className = "combo-empty";
+          empty.textContent = "No matching options";
+          listElement.appendChild(empty);
+          listElement.classList.add("show");
+          state.isOpen = true;
+          return;
+        }
+        close();
+        return;
+      }
+
+      state.filtered.forEach((item, idx) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "combo-item";
+        if (idx === state.activeIndex) btn.classList.add("active");
+        btn.dataset.value = item;
+        btn.textContent = item;
+        listElement.appendChild(btn);
+      });
+
+      listElement.classList.add("show");
+      state.isOpen = true;
+    }
+
+    inputElement.addEventListener("focus", () => render(inputElement.value, true));
+    inputElement.addEventListener("input", () => {
+      state.activeIndex = -1;
+      render(inputElement.value, false);
+    });
+    inputElement.addEventListener("keydown", (event) => {
+      if (!state.isOpen && (event.key === "ArrowDown" || event.key === "ArrowUp")) {
+        render(inputElement.value, true);
+      }
+      if (!state.isOpen) return;
+
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        state.activeIndex = Math.min(state.activeIndex + 1, state.filtered.length - 1);
+        render(inputElement.value, false);
+      } else if (event.key === "ArrowUp") {
+        event.preventDefault();
+        state.activeIndex = Math.max(state.activeIndex - 1, 0);
+        render(inputElement.value, false);
+      } else if (event.key === "Enter") {
+        if (state.activeIndex >= 0 && state.filtered[state.activeIndex]) {
+          event.preventDefault();
+          selectValue(state.filtered[state.activeIndex], true);
+        }
+      } else if (event.key === "Escape") {
+        close();
+      }
+    });
+    inputElement.addEventListener("blur", () => setTimeout(close, 120));
+    listElement.addEventListener("mousedown", (event) => event.preventDefault());
+    listElement.addEventListener("click", (event) => {
+      const item = event.target.closest(".combo-item");
+      if (!item) return;
+      selectValue(item.dataset.value || "", true);
+    });
+
+    const controller = {
+      setOptions(items, placeholder, selectedValue = "") {
+        const seen = new Set();
+        state.options = (items || []).map(formatComboOption).filter(v => v && !seen.has(v) && seen.add(v));
+        inputElement.placeholder = placeholder;
+        const nextValue = formatComboOption(selectedValue);
+        if (nextValue || selectedValue === "") {
+          inputElement.value = nextValue;
+        }
+        render(inputElement.value, false);
+        if (!inputElement.matches(":focus")) close();
+      },
+      close
+    };
+
+    comboRegistry.set(inputElement.id, controller);
+    return controller;
+  }
+
+  registerCombo(brandSelect, brandNameList);
+  registerCombo(modelSelect, modelNameList);
+  registerCombo(subModelSelect, subModelList);
+  registerCombo(yearSelect, yearManufactureList);
+
+  function fillCombo(inputElement, listElement, items, placeholder, selectedValue = "") {
+    const combo = comboRegistry.get(inputElement.id);
+    if (!combo) return;
+    combo.setOptions(items, placeholder, selectedValue);
+  }
+
+  function fillDetailSelect(selectElement, options, selectedValue = "") {
+    const seen = new Set();
+    const cleanOptions = (options || [])
+      .map(formatComboOption)
+      .filter(v => v && !seen.has(v) && seen.add(v));
+    selectElement.innerHTML = "";
+    const defaultOpt = document.createElement("option");
+    defaultOpt.value = "";
+    defaultOpt.textContent = "Select";
+    selectElement.appendChild(defaultOpt);
+    cleanOptions.forEach(v => {
+      const opt = document.createElement("option");
+      opt.value = v;
+      opt.textContent = v;
+      selectElement.appendChild(opt);
+    });
+    selectElement.value = cleanOptions.includes(selectedValue) ? selectedValue : "";
+  }
+
+  function applyEngineModeByCarType() {
+    const carType = formatComboOption(carTypeInput.value).toUpperCase();
+    if (carType === "EV") {
+      engineInput.value = "-";
+      engineInput.disabled = true;
+      fuelInput.value = "-";
+      fuelInput.disabled = true;
+    } else {
+      if (engineInput.value.trim() === "-") {
+        engineInput.value = "";
+        fuelInput.value = "";
+      }
+      engineInput.disabled = false;
+      fuelInput.disabled = false;
+      if (!engineInput.placeholder) engineInput.placeholder = "x.x";
+      if (!fuelInput.placeholder) fuelInput.placeholder = "ex. Benzine";
+    }
+  }
+
+  function setManualDetailMode(enabled) {
+    manualDetailMode = enabled;
+    const valueNodes = [carTypeValue, gearValue, assetGroupValue, engineValue, newPriceValue, fuelValue];
+    const inputNodes = [carTypeInput, gearInput, assetGroupInput, engineInput, newPriceInput, fuelInput];
+    valueNodes.forEach(el => { el.style.display = enabled ? "none" : ""; });
+    inputNodes.forEach(el => { el.style.display = enabled ? "" : "none"; });
+  }
+
+  function updateCarDetail(detail, fallbackChoices = {}) {
+    const hasFullSelection = Boolean(
+      brandSelect.value && modelSelect.value && subModelSelect.value && yearSelect.value
+    );
+    const detailFound = Boolean(detail?.detail_found);
+    const carTypeText = formatComboOption(detail?.car_type || "");
+    const gearText = formatComboOption(detail?.gear || "");
+    const assetGroupText = formatComboOption(detail?.asset_group || "");
+    const engineText = formatComboOption(detail?.engine || "");
+    const fuelText = formatComboOption(detail?.fuel || "");
+    const hasMissingCoreDetail = !(carTypeText && gearText && assetGroupText && engineText);
+
+    if (hasFullSelection && (!detailFound || hasMissingCoreDetail)) {
+      setManualDetailMode(true);
+      fillDetailSelect(carTypeInput, fallbackChoices.car_types || [], carTypeText);
+      fillDetailSelect(fuelInput, fallbackChoices.fuels || [], fuelText);
+      fillDetailSelect(gearInput, fallbackChoices.gears || [], gearText);
+      fillDetailSelect(assetGroupInput, fallbackChoices.asset_groups || [], assetGroupText);
+      engineInput.value = engineText && engineText !== "-" ? engineText : "";
+      fuelInput.value = fuelText && fuelText !== "-" ? fuelText : "";
+      newPriceInput.value = "";
+      engineInput.placeholder = "x.x";
+      fuelInput.placeholder = "x.x";
+      applyEngineModeByCarType();
+      return;
+    }
+
+    setManualDetailMode(false);
+    carTypeValue.textContent = detail?.car_type || "-";
+    gearValue.textContent = detail?.gear || "-";
+    assetGroupValue.textContent = detail?.asset_group || "-";
+    fuelValue.textContent = detail?.fuel || "-";
+    engineValue.textContent = detail?.engine || "-";
+    newPriceValue.textContent = detail?.new_price || "-";
+  }
+
+  function updateAssetRegisterYearValidation() {
+    if (!assetRegisterYear || !yearSelect) return;
+    const defaultYear = Number(formatComboOption(yearSelect.value));
+    const registerYear = Number(String(assetRegisterYear.value || "").trim());
+    const isInvalid = Number.isFinite(defaultYear)
+      && Number.isFinite(registerYear)
+      && registerYear < defaultYear;
+    assetRegisterYear.classList.toggle("is-invalid-year", isInvalid);
+  }
+
+  function syncAssetRegisterYearFromManufacture() {
+    if (!yearSelect || !assetRegisterYear) return;
+    const manufactureYear = formatComboOption(yearSelect.value);
+    if (!manufactureYear) {
+      if (!assetRegisterYear.value || String(assetRegisterYear.value).trim() === lastSyncedManufactureYear) {
+        assetRegisterYear.value = "";
+      }
+      lastSyncedManufactureYear = "";
+      updateAssetRegisterYearValidation();
+      return;
+    }
+
+    const registerYear = String(assetRegisterYear.value || "").trim();
+    if (!registerYear || registerYear === lastSyncedManufactureYear) {
+      assetRegisterYear.value = manufactureYear;
+    }
+    lastSyncedManufactureYear = manufactureYear;
+    updateAssetRegisterYearValidation();
+  }
+
+  async function updateChoices(options = {}) {
+    const preserveModel = options.preserveModel ?? true;
+    const preserveSubModel = options.preserveSubModel ?? true;
+    const preserveYear = options.preserveYear ?? true;
+
+    const currentBrand = brandSelect.value;
+    const currentModel = modelSelect.value;
+    const currentSubModel = subModelSelect.value;
+    const currentYear = yearSelect.value;
+
+    const params = new URLSearchParams({
+      brand_name: currentBrand,
+      model_name: currentModel,
+      sub_model: currentSubModel,
+      year_of_manufacture: currentYear
+    });
+
+    const response = await fetch(`{% url 'branch_predict_option' %}?${params.toString()}`);
+    const data = await response.json();
+
+    const nextModel =
+      preserveModel && currentModel ? currentModel : "";
+
+    fillCombo(modelSelect, modelNameList, data.models, "Select model", nextModel);
+
+    const nextSubModel =
+      preserveSubModel && currentSubModel ? currentSubModel : "";
+
+    fillCombo(subModelSelect, subModelList, data.sub_models, "Select sub model", nextSubModel);
+
+    const nextYear =
+      preserveYear && currentYear ? currentYear : "";
+
+    fillCombo(yearSelect, yearManufactureList, data.years, "Select year", nextYear);
+
+    updateCarDetail(data.car_detail, data.fallback_detail_choices || {});
+    syncAssetRegisterYearFromManufacture();
+  }
+
+  brandSelect.addEventListener("change", async function () {
+    modelSelect.value = "";
+    subModelSelect.value = "";
+    yearSelect.value = "";
+    updateCarDetail(null);
+
+    await updateChoices({
+      preserveModel: false,
+      preserveSubModel: false,
+      preserveYear: false
+    });
+  });
+
+  modelSelect.addEventListener("change", async function () {
+    subModelSelect.value = "";
+    yearSelect.value = "";
+    updateCarDetail(null);
+
+    await updateChoices({
+      preserveModel: true,
+      preserveSubModel: false,
+      preserveYear: false
+    });
+  });
+
+  subModelSelect.addEventListener("change", async function () {
+    yearSelect.value = "";
+    updateCarDetail(null);
+
+    await updateChoices({
+      preserveModel: true,
+      preserveSubModel: true,
+      preserveYear: false
+    });
+  });
+
+  yearSelect.addEventListener("change", async function () {
+    await updateChoices({
+      preserveModel: true,
+      preserveSubModel: true,
+      preserveYear: true
+    });
+  });
+
+  carTypeInput.addEventListener("change", applyEngineModeByCarType);
+
+  if (assetRegisterYear) {
+    assetRegisterYear.addEventListener("input", updateAssetRegisterYearValidation);
+  }
+
+  document.addEventListener("DOMContentLoaded", async function () {
+    updateCarDetail(null);
+
+    await updateChoices({
+      preserveModel: false,
+      preserveSubModel: false,
+      preserveYear: false
+    });
+  });
+
+  async function requestPredictPrice() {
+    const carTypeText = manualDetailMode ? (carTypeInput.value || "") : (carTypeValue.textContent === "-" ? "" : carTypeValue.textContent);
+    const gearText = manualDetailMode ? (gearInput.value || "") : (gearValue.textContent === "-" ? "" : gearValue.textContent);
+    const assetGroupText = manualDetailMode ? (assetGroupInput.value || "") : (assetGroupValue.textContent === "-" ? "" : assetGroupValue.textContent);
+    const engineText = manualDetailMode ? (engineInput.value || "") : (engineValue.textContent === "-" ? "" : engineValue.textContent);
+    const fuelText = manualDetailMode ? (fuelInput.value || "") : (fuelValue.textContent === "-" ? "" : fuelValue.textContent);
+    const newPriceText = manualDetailMode ? (newPriceInput.value || "") : "";
+
+    const payload = new URLSearchParams({
+      brand_name: brandSelect.value || "",
+      model_name: modelSelect.value || "",
+      sub_model: subModelSelect.value || "",
+      year_of_manufacture: yearSelect.value || "",
+      asset_register_year: assetRegisterYear.value || "",
+      mile: mile.value || "",
+      historical: historical.value || "",
+      branch: branch.value || "",
+      grade: grade.value || "",
+      car_type: carTypeText,
+      gear: gearText,
+      asset_group: assetGroupText,
+      engine: engineText,
+      fuel: fuelText,
+      new_price: newPriceText
+    });
+
+    const response = await fetch(`{% url 'branch_predict_price' %}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+        "X-CSRFToken": csrfToken
+      },
+      body: payload.toString()
+    });
+
+    const data = await response.json();
+    if (!response.ok || !data.ok) {
+      throw new Error(data.message || "Cannot predict price now.");
+    }
+
+    return data;
+  }
+
+  function renderHistoryChart(labels, values, message) {
+    if (historyChart) {
+      historyChart.destroy();
+      historyChart = null;
+    }
+
+    const hasData = Array.isArray(values) && values.length > 0;
+    historyEmpty.style.display = hasData ? "none" : "block";
+    historyEmpty.textContent = message || "ไม่พบข้อมูลการขายในอดีต";
+
+    if (!hasData) {
+      return;
+    }
+
+    historyChart = new Chart(historyChartCanvas, {
+      type: "line",
+      data: {
+        labels: labels,
+        datasets: [{
+          label: "Sold",
+          data: values,
+          borderColor: "#4AD797",
+          backgroundColor: "rgba(37, 99, 235, 0.15)",
+          tension: 0.25,
+          fill: true,
+          pointRadius: 3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          x: {
+            ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 6 }
+          },
+          y: {
+            ticks: {
+              callback: function (value) {
+                return Number(value).toLocaleString();
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // Result card is shown via CSS; ensure Chart recalculates dimensions correctly.
+    requestAnimationFrame(() => {
+      if (historyChart) historyChart.resize();
+    });
+  }
+
+  function fmt(n) {
+    return Number(n).toLocaleString();
+  }
+
+  function getUniqueBranches(data) {
+    const fromValues = Array.isArray(data.branch_values) ? data.branch_values : [];
+    const fromResults = (data.results || []).map(r => r.branch).filter(Boolean);
+    return Array.from(new Set([...fromValues, ...fromResults]));
+  }
+
+  function getBranchAverageMap(data) {
+    const map = {};
+    (data.results || []).forEach((row) => {
+      if (!row || !row.branch) return;
+      if (!map[row.branch]) {
+        map[row.branch] = { total: 0, count: 0 };
+      }
+      map[row.branch].total += Number(row.predicted || 0);
+      map[row.branch].count += 1;
+    });
+
+    const avgMap = {};
+    Object.keys(map).forEach((branchName) => {
+      const item = map[branchName];
+      avgMap[branchName] = item.count ? item.total / item.count : 0;
+    });
+    return avgMap;
+  }
+
+  function branchColorByPrice(price, minPrice, maxPrice) {
+    if (!Number.isFinite(price)) return "#e5e7eb";
+    const span = Math.max(maxPrice - minPrice, 1);
+    const ratio = Math.max(0, Math.min(1, (price - minPrice) / span));
+    const lightness = 92 - (ratio * 38); // high price = darker
+    return `hsl(158, 72%, ${lightness}%)`;
+  }
+
+  const branchProvinceCode = {
+    "กรุงเทพมหานคร": "TH-10",
+    "นครราชสีมา": "TH-30",
+    "พัทยา": "TH-20",
+    "รังสิต คลอง 8": "TH-13",
+    "สงขลา": "TH-90",
+    "สุราษฎร์ธานี": "TH-84",
+    "อุดรธานี": "TH-41",
+    "เชียงใหม่": "TH-50",
+    "ขอนแก่น": "TH-40",
+    "อุบลราชธานี": "TH-34",
+    "ระยอง": "TH-21",
+    "ราชบุรี": "TH-70"
+  };
+
+  function syncActiveBranchVisual(activeName) {
+    Array.from(branchMapGrid.querySelectorAll(".branch-map-btn")).forEach((node) => {
+      node.classList.toggle("active", node.dataset.branch === activeName);
+    });
+  }
+
+  function destroyGeoChart() {
+    try {
+      if (geoBranchChart) {
+        if (window.google && google.visualization && google.visualization.events) {
+          google.visualization.events.removeAllListeners(geoBranchChart);
+        }
+        if (typeof geoBranchChart.clearChart === "function") {
+          geoBranchChart.clearChart();
+        }
+      }
+    } catch (e) {}
+    geoBranchChart = null;
+  }
+
+  function invalidateGeoDraws() {
+    geoDrawVersion += 1;
+    geoChartReadyQueue.length = 0;
+  }
+
+  function setBranchGeoMapMessage(message) {
+    destroyGeoChart();
+    if (!branchGeoMap) return;
+    branchGeoMap.innerHTML = `<div style="padding:12px;color:#6b7280;">${message}</div>`;
+  }
+
+  function flushGeoChartReadyQueue() {
+    const queued = geoChartReadyQueue.splice(0, geoChartReadyQueue.length);
+    queued.forEach((fn) => fn());
+  }
+
+  function ensureGeoChartReady(onReady) {
+    if (
+      geoChartReady ||
+      (window.google && google.visualization && google.visualization.GeoChart)
+    ) {
+      geoChartReady = true;
+      onReady();
+      return;
+    }
+
+    geoChartReadyQueue.push(onReady);
+    if (geoChartLoading) return;
+    geoChartLoading = true;
+
+    if (!window.google || !google.charts || !google.charts.load) {
+      geoChartLoading = false;
+      geoChartReadyQueue.length = 0;
+      setBranchGeoMapMessage("ไม่สามารถเริ่มโหลด Google Charts ได้");
+      return;
+    }
+
+    google.charts.load("51", { packages: ["geochart"] });
+    google.charts.setOnLoadCallback(() => {
+      geoChartReady = Boolean(window.google && google.visualization && google.visualization.GeoChart);
+      geoChartLoading = false;
+      if (!geoChartReady) {
+        geoChartReadyQueue.length = 0;
+        setBranchGeoMapMessage("โหลดโมดูล GeoChart ไม่สำเร็จ");
+        return;
+      }
+      flushGeoChartReadyQueue();
+    });
+  }
+
+  function resetGeoChart() {
+    invalidateGeoDraws();
+    destroyGeoChart();
+    if (branchGeoMap) {
+      branchGeoMap.innerHTML = "";
+    }
+  }
+
+  function isGeoDrawCurrent(drawVersion) {
+    return drawVersion === geoDrawVersion;
+  }
+
+  function paintGeoBranchMap(rows, codeToBranch, selectedBranch, drawVersion) {
+    if (!branchGeoMap || !isGeoDrawCurrent(drawVersion)) return;
+
+    const dataTable = google.visualization.arrayToDataTable(rows);
+    const options = {
+      region: "TH",
+      resolution: "provinces",
+      displayMode: "regions",
+      datalessRegionColor: "#ececec",
+      defaultColor: "#e6f4ef",
+      colorAxis: { colors: ["#cdeee2", "#10b981"] },
+      backgroundColor: "transparent",
+      legend: "none",
+      tooltip: { trigger: "focus" },
+      keepAspectRatio: true,
+      width: Math.max(branchGeoMap.clientWidth || 0, 320),
+      height: Math.max(branchGeoMap.clientHeight || 0, 320)
+    };
+
+    destroyGeoChart();
+    if (!isGeoDrawCurrent(drawVersion)) return;
+
+    branchGeoMap.innerHTML = "";
+    geoBranchChart = new google.visualization.GeoChart(branchGeoMap);
+    google.visualization.events.addListener(geoBranchChart, "select", () => {
+      if (!geoBranchChart || !isGeoDrawCurrent(drawVersion)) return;
+      const selected = geoBranchChart.getSelection();
+      if (!Array.isArray(selected) || !selected.length || !selected[0]) return;
+      const row = selected[0].row;
+      if (typeof row !== "number") return;
+      const code = dataTable.getValue(row, 0);
+      const branchName = codeToBranch[code];
+      if (!branchName || !currentMultiData) return;
+      activeBranch = branchName;
+      syncActiveBranchVisual(activeBranch);
+      renderMultiTable(currentMultiData, activeBranch);
+    });
+
+    try {
+      geoBranchChart.draw(dataTable, options);
+    } catch (e) {
+      setBranchGeoMapMessage("ไม่สามารถแสดงแผนที่ได้ กรุณาลองใหม่อีกครั้ง");
+      return;
+    }
+
+    const selectedCode = branchProvinceCode[selectedBranch || ""];
+    if (!selectedCode || !isGeoDrawCurrent(drawVersion)) return;
+
+    for (let i = 1; i < rows.length; i += 1) {
+      if (rows[i][0] !== selectedCode) continue;
+      window.setTimeout(() => {
+        if (!geoBranchChart || !isGeoDrawCurrent(drawVersion)) return;
+        try {
+          geoBranchChart.setSelection([{ row: i - 1, column: null }]);
+        } catch (e) {}
+      }, 0);
+      break;
+    }
+  }
+
+  function drawGeoBranchMap(branches, branchAvgMap, minAvg, maxAvg, selectedBranch, retry = 0, drawVersion = null) {
+    if (!branchGeoMap) return;
+    const activeDrawVersion = drawVersion == null ? ++geoDrawVersion : drawVersion;
+    if (!isGeoDrawCurrent(activeDrawVersion)) return;
+
+    const runDraw = () => {
+      if (!branchGeoMap || !isGeoDrawCurrent(activeDrawVersion)) return;
+      if (!geoChartReady || !window.google || !google.visualization || !google.visualization.GeoChart) {
+        if (!geoChartLoading) {
+          setBranchGeoMapMessage("กำลังโหลดแผนที่...");
+        }
+        ensureGeoChartReady(() => drawGeoBranchMap(
+          branches,
+          branchAvgMap,
+          minAvg,
+          maxAvg,
+          selectedBranch,
+          retry + 1,
+          activeDrawVersion
+        ));
+        return;
+      }
+
+      const rows = [["Province", "Price"]];
+      const codeToBranch = {};
+      branches.forEach((branchName) => {
+        const code = branchProvinceCode[branchName];
+        const avgPrice = branchAvgMap[branchName];
+        if (!code || !Number.isFinite(avgPrice)) return;
+        rows.push([code, avgPrice]);
+        codeToBranch[code] = branchName;
+      });
+
+      if (rows.length === 1) {
+        setBranchGeoMapMessage("ไม่มีข้อมูลจังหวัดที่ใช้แสดงผลบนแผนที่");
+        return;
+      }
+
+      if (!isGeoDrawCurrent(activeDrawVersion)) return;
+      paintGeoBranchMap(rows, codeToBranch, selectedBranch, activeDrawVersion);
+    };
+
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(runDraw);
+    });
+  }
+
+  function renderBranchAverageTable(branchAvgMap, selectedBranch = "") {
+    const rows = Object.entries(branchAvgMap || {})
+      .filter(([, avg]) => Number.isFinite(avg))
+      .sort((a, b) => b[1] - a[1]);
+
+    if (!rows.length) {
+      branchAvgBody.innerHTML = "<tr><td colspan='2'>-</td></tr>";
+      return;
+    }
+
+    branchAvgBody.innerHTML = rows.map(([branchName, avg]) => {
+      const mark = selectedBranch && selectedBranch === branchName ? " style='font-weight:700;'" : "";
+      return `<tr>
+        <td${mark}>${branchName}</td>
+        <td${mark}>${fmt(Math.round(avg))} THB</td>
+      </tr>`;
+    }).join("");
+  }
+
+  function renderBranchMap(data, selectedBranch = "") {
+    const branches = getUniqueBranches(data);
+    const branchAvgMap = getBranchAverageMap(data);
+    const avgValues = Object.values(branchAvgMap).filter(v => Number.isFinite(v));
+    const minAvg = avgValues.length ? Math.min(...avgValues) : 0;
+    const maxAvg = avgValues.length ? Math.max(...avgValues) : 0;
+    branchMapGrid.innerHTML = "";
+    if (!branches.length) {
+      branchMapWrap.classList.remove("show");
+      return "";
+    }
+
+    branchMapWrap.classList.add("show");
+    const initialBranch = selectedBranch && branches.includes(selectedBranch) ? selectedBranch : branches[0];
+
+    branches.forEach((branchName) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "branch-map-btn";
+      const avgPrice = branchAvgMap[branchName];
+      btn.textContent = branchName;
+      btn.dataset.branch = branchName;
+      if (branches.length === 1) btn.disabled = true;
+      if (branchName === initialBranch) {
+        btn.classList.add("active");
+      }
+      btn.addEventListener("click", () => {
+        if (!currentMultiData) return;
+        activeBranch = branchName;
+        syncActiveBranchVisual(activeBranch);
+        renderMultiTable(currentMultiData, activeBranch);
+      });
+      branchMapGrid.appendChild(btn);
+    });
+
+    drawGeoBranchMap(branches, branchAvgMap, minAvg, maxAvg, initialBranch);
+    renderBranchAverageTable(branchAvgMap, initialBranch);
+
+    return initialBranch;
+  }
+
+  function renderMultiTable(data, selectedBranch = "") {
+    const grades = data.grade_values;
+    const miles = data.mileage_values;
+    const allResults = data.results || [];
+    const branches = getUniqueBranches(data);
+    const branchAvgMap = getBranchAverageMap(data);
+    const branchInUse = selectedBranch || (branches.length ? branches[0] : "");
+    const results = branches.length > 1
+      ? allResults.filter(r => r.branch === branchInUse)
+      : allResults;
+    const onlyGrade = miles.length === 1;
+    const onlyMile = grades.length === 1;
+
+    let headHtml = "<tr>";
+    let noteText = "";
+
+    if (!onlyGrade && !onlyMile) {
+      headHtml += '<th>Grade \\ Mile (km)</th>';
+      miles.forEach(m => { headHtml += `<th>${fmt(m)}</th>`; });
+      noteText = "ตารางแสดงราคาประเมิน (THB) ตาม Grade (แถว) และ Mileage (คอลัมน์)";
+    } else if (onlyGrade) {
+      headHtml += '<th>Grade</th><th>Predicted Price</th><th>Min Price</th><th>Max Price</th>';
+      noteText = `ตารางแสดงราคาประเมิน (THB) แต่ละ Grade สำหรับ Mileage ${fmt(miles[0])} km`;
+    } else {
+      headHtml += '<th>Mile (km)</th><th>Predicted Price</th><th>Min Price</th><th>Max Price</th>';
+      noteText = `ตารางแสดงราคาประเมิน (THB) แต่ละ Mileage สำหรับ Grade ${grades[0]}`;
+    }
+    if (branchInUse) {
+      noteText += ` | สาขา: ${branchInUse}`;
+    }
+    multiResultBranch.textContent = branchInUse || "-";
+    renderBranchAverageTable(branchAvgMap, branchInUse);
+    headHtml += "</tr>";
+    multiResultHead.innerHTML = headHtml;
+    multiResultNote.textContent = noteText;
+
+    const lookup = {};
+    results.forEach(r => { lookup[r.grade + "_" + r.mileage] = r; });
+
+    let bodyHtml = "";
+
+    if (!onlyGrade && !onlyMile) {
+      grades.forEach(g => {
+        bodyHtml += `<tr><td>Grade ${g}</td>`;
+        miles.forEach(m => {
+          const r = lookup[g + "_" + m];
+          if (r) {
+            bodyHtml += `<td>
+              <div class="cell-predicted">${fmt(r.predicted)}</div>
+              <div class="cell-range">${fmt(r.min_price)} – ${fmt(r.max_price)}</div>
+            </td>`;
+          } else {
+            bodyHtml += "<td>-</td>";
+          }
+        });
+        bodyHtml += "</tr>";
+      });
+    } else if (onlyGrade) {
+      grades.forEach(g => {
+        const r = lookup[g + "_" + miles[0]];
+        if (r) {
+          bodyHtml += `<tr>
+            <td>Grade ${g}</td>
+            <td class="cell-predicted">${fmt(r.predicted)} THB</td>
+            <td>${fmt(r.min_price)} THB</td>
+            <td>${fmt(r.max_price)} THB</td>
+          </tr>`;
+        }
+      });
+    } else {
+      miles.forEach(m => {
+        const r = lookup[grades[0] + "_" + m];
+        if (r) {
+          bodyHtml += `<tr>
+            <td>${fmt(m)}</td>
+            <td class="cell-predicted">${fmt(r.predicted)} THB</td>
+            <td>${fmt(r.min_price)} THB</td>
+            <td>${fmt(r.max_price)} THB</td>
+          </tr>`;
+        }
+      });
+    }
+
+    multiResultBody.innerHTML = bodyHtml;
+  }
+
+  predictBtn.addEventListener("click", async function () {
+    predictBtn.disabled = true;
+    predictBtn.textContent = "Predicting...";
+    clearFormError();
+
+    try {
+      const data = await requestPredictPrice();
+
+      if (data.is_multi) {
+        singleResultGrid.style.display = "none";
+        multiResultWrap.classList.add("show");
+        currentMultiData = data;
+
+        multiResultBrandModel.textContent = data.brand_model || "-";
+        multiResultFuel.textContent = data.fuel || "-";
+        multiResultBranch.textContent = "-";
+        multiResultNewPrice.textContent = data.newprice ? `${fmt(data.newprice)} THB` : "-";
+        multiResultSummary.textContent = data.summary || "";
+
+        activeBranch = renderBranchMap(data, activeBranch);
+        multiResultBranch.textContent = activeBranch || "-";
+        renderMultiTable(data, activeBranch);
+      } else {
+        singleResultGrid.style.display = "";
+        multiResultWrap.classList.remove("show");
+        branchMapWrap.classList.remove("show");
+        branchMapGrid.innerHTML = "";
+        resetGeoChart();
+        branchAvgBody.innerHTML = "";
+        currentMultiData = null;
+        activeBranch = "";
+
+        resultBrandModel.textContent = data.brand_model || "-";
+        resultFuel.textContent = data.fuel || "-";
+        resultBranch.textContent = data.branch || "-";
+        resultNewPrice.textContent = data.newprice ? `${fmt(data.newprice)} THB` : "-";
+        predictedPrice.textContent = `${fmt(data.predicted_price)} THB`;
+        predictedMinPrice.textContent = data.min_price ? `${fmt(data.min_price)} THB` : "-";
+        predictedMaxPrice.textContent = data.max_price ? `${fmt(data.max_price)} THB` : "-";
+        resultSummary.textContent = data.summary || "";
+      }
+
+      resultCard.classList.add("show");
+      resultCard.scrollIntoView({ behavior: "smooth", block: "start" });
+
+      renderHistoryChart(data.history_labels || [], data.history_values || [], data.history_message || "");
+    } catch (error) {
+      showFormError(error.message);
+    } finally {
+      predictBtn.disabled = false;
+      predictBtn.textContent = "Predict";
+    }
+  });
+
+  clearBtn.addEventListener("click", async function () {
+    brandSelect.value = "";
+    modelSelect.value = "";
+    subModelSelect.value = "";
+    yearSelect.value = "";
+    assetRegisterYear.value = "";
+    assetRegisterYear.classList.remove("is-invalid-year");
+    lastSyncedManufactureYear = "";
+    mile.value = "";
+    historical.value = "";
+    grade.value = "";
+    newPriceInput.value = "";
+    branch.value = "";
+
+    updateCarDetail(null);
+    setManualDetailMode(false);
+
+    predictedPrice.textContent = "-";
+    predictedMinPrice.textContent = "-";
+    predictedMaxPrice.textContent = "-";
+    resultBrandModel.textContent = "-";
+    resultFuel.textContent = "-";
+    resultBranch.textContent = "-";
+    resultNewPrice.textContent = "-";
+    resultSummary.textContent =
+      "This estimated used car price is calculated from the selected vehicle information, registration year, mileage, vehicle grade, and other related details.";
+    renderHistoryChart([], [], "ไม่พบข้อมูลการขายในอดีต");
+
+    singleResultGrid.style.display = "";
+    multiResultWrap.classList.remove("show");
+    branchMapWrap.classList.remove("show");
+    branchMapGrid.innerHTML = "";
+    resetGeoChart();
+    branchAvgBody.innerHTML = "";
+    currentMultiData = null;
+    activeBranch = "";
+    multiResultHead.innerHTML = "";
+    multiResultBody.innerHTML = "";
+
+    resultCard.classList.remove("show");
+
+    await updateChoices({
+      preserveModel: false,
+      preserveSubModel: false,
+      preserveYear: false
+    });
+  });
+</script>
+{% endblock %}
