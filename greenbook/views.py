@@ -670,8 +670,8 @@ def predict_price(request):
         fuel = "Electric"
     
     message = "Please"
-    if not car_type or not gear or not asset_group or not engine or not newprice or not fuel or not register_year or not historical or (year > register_year):
-        if not car_type or not gear or not asset_group or not engine or not newprice or not fuel or not register_year or not historical:
+    if not car_type or not gear or not asset_group or not engine or not newprice or not fuel or not register_year or not historical or (year > register_year) or not register_year_raw:
+        if not car_type or not gear or not asset_group or not engine or not newprice or not fuel or not register_year or not historical or not register_year_raw:
             message = " input "
             if not car_type:
                 message += "Car type, "
@@ -690,7 +690,7 @@ def predict_price(request):
             if not historical:
                 message += "Historical, "
             message += "please."
-        if year > register_year:
+        if register_year and year > register_year:
             message += " register year could more than year of manufacture"
 
         return JsonResponse({
@@ -725,6 +725,13 @@ def predict_price(request):
                             "Grade_Score": g,
                             "Mile_Bucket":mile_bucket,
                             "Age_x_Mile":Age_x_Mile,
+                            "avg_price_lag_1":newprice,
+                            "avg_price_lag_3":newprice,
+                            "avg_price_roll_3":newprice,
+                            "market_price_roll_3":newprice,
+                            "market_price_lag_1":newprice,
+                            "market_price_lag_2":newprice,
+                            "market_price_lag_3":newprice,
                         }]
                         
                         model_predict_name = 'greenbook/models/Normal/Special/ev.pkl'
@@ -749,6 +756,13 @@ def predict_price(request):
                             "Grade_Score": g,
                             "Mile_Bucket":mile_bucket,
                             "Age_x_Mile":Age_x_Mile,
+                            "avg_price_lag_1":newprice,
+                            "avg_price_lag_3":newprice,
+                            "avg_price_roll_3":newprice,
+                            "market_price_roll_3":newprice,
+                            "market_price_lag_1":newprice,
+                            "market_price_lag_2":newprice,
+                            "market_price_lag_3":newprice,
                         }]
                         model_predict_name = 'greenbook/models/Normal/Special/n_ev.pkl'
 
@@ -840,6 +854,7 @@ def predict_price(request):
                         "Sub_Model_Code": sub_model_code_trans,
                         "Fuel": fuel,
                         "Asset_Gear": gear,
+                        "Car_Type": Car_Type,
                         "Asset_Group_Code": asset_group_code,
                         "Car_Status": historical_factor,
                         "Year_of_Manufacture": year,
@@ -1217,6 +1232,7 @@ def branch_predict_price(request):
         sub_model_code=sub_model,
         year_of_manufacture=year,
     )
+    
     sub_model_norm = str(sub_model).upper().replace(" ", "").replace("-", "").replace("(NEW)", "")
     car_filter = table[
         (table['brand_name'] == brand)
@@ -1385,9 +1401,16 @@ def branch_predict_price(request):
                                 "Grade_Score": g,
                                 "Mile_Bucket":mile_bucket,
                                 "Age_x_Mile":Age_x_Mile,
+                                "avg_price_lag_1":newprice,
+                                "avg_price_lag_3":newprice,
+                                "avg_price_roll_3":newprice,
+                                "market_price_roll_3":newprice,
+                                "market_price_lag_1":newprice,
+                                "market_price_lag_2":newprice,
+                                "market_price_lag_3":newprice,
                             }]
 
-                            model_predict_name = 'greenbook/models/Normal/Special/ev.pkl'
+                            model_predict_name = 'greenbook/models/Branch/Special/ev.pkl'
                         else:
                                 
                             input_data = [{
@@ -1410,9 +1433,16 @@ def branch_predict_price(request):
                                 "Grade_Score": g,
                                 "Mile_Bucket":mile_bucket,
                                 "Age_x_Mile":Age_x_Mile,
+                                "avg_price_lag_1":newprice,
+                                "avg_price_lag_3":newprice,
+                                "avg_price_roll_3":newprice,
+                                "market_price_roll_3":newprice,
+                                "market_price_lag_1":newprice,
+                                "market_price_lag_2":newprice,
+                                "market_price_lag_3":newprice,
                             }]
 
-                            model_predict_name = 'greenbook/models/Normal/Special/n_ev.pkl'
+                            model_predict_name = 'greenbook/models/Branch/Special/n_ev.pkl'
 
                         predicted = int(round(ml_predict(model_predict_name,input_data)))
                         min_price = int(round(predicted * 0.95))
